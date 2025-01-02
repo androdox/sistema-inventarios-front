@@ -6,7 +6,6 @@ import ProductList from './components/ProductList';
 const App = () => {
   const [products, setProducts] = useState([]);
   const [productToEdit, setProductToEdit] = useState(null);
-  const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
 
   // Manejar inicio de sesión
@@ -20,22 +19,8 @@ const App = () => {
     const token = urlParams.get('token');
     if (token) {
       setToken(token);
-      const userData = parseJwt(token);
-      setUser(userData);
     }
   }, []);
-
-  // Decodificar el JWT
-  const parseJwt = (token) => {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      return JSON.parse(window.atob(base64));
-    } catch (e) {
-      console.error('Error al decodificar el token:', e);
-      return null;
-    }
-  };
 
   // Obtener productos
   const fetchProducts = useCallback(async () => {
@@ -85,7 +70,7 @@ const App = () => {
 
 
   const handleEditProduct = async (updatedProduct) => {
-    if (!token) return; // Asegúrate de que haya un token
+    if (!token) return; 
 
     try {
       const response = await fetch(`http://localhost:3000/products/${updatedProduct.id}`, {
@@ -116,7 +101,7 @@ const App = () => {
   };
 
   const handleAddProduct = async (newProduct) => {
-    if (!token) return; // Asegúrate de que haya un token
+    if (!token) return; 
 
     try {
       const response = await fetch('http://localhost:3000/products', {
@@ -165,10 +150,12 @@ const App = () => {
         <Route
           path="/"
           element={
-            !user ? (
-              <button onClick={handleLogin} className="btn btn-primary">
-                Iniciar sesión con Google
-              </button>
+            !token ? (
+              <div className="d-flex justify-content-center">
+                <button onClick={handleLogin} className="btn btn-primary">
+                  Iniciar sesión con Google
+                </button>
+              </div>
             ) : (
               <div>
                 <AddProduct
